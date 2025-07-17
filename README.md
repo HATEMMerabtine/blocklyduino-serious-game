@@ -227,9 +227,13 @@ Thanks to: Neil Fraser, Q.Neutron, Dale Low, Seeeduino, Arduino, contributors of
 
 ### Contributors
 
--   **[Hatem Merabtine]** – Main developer; implemented BlocklyDuino integration, level-based system, and other features.
--   **[Dr. Rida Mezghache]** – Project supervisor; provided concept design, guidance on features, and documentation planning.
 
+Hatem Merabtine ([@HATEMMerabtine](https://github.com/HATEMMerabtine))  
+Lead developer of the level-based learning environment and GDevelop integration.
+
+**Project Supervisor**  
+Dr. Rida Mezghache ([@Rida-Mezghache](https://github.com/Rida-Mezghache))  
+Provided conceptual design, feature guidance, and documentation strategy.
 ---
 
 ## 9. License
