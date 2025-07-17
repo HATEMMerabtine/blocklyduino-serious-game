@@ -1,0 +1,1598 @@
+<!DOCTYPE html>
+<html manifest="node.manifest">
+
+<head>
+  <meta charset="utf-8">
+  <title>BlocklyDuino - Smart in the Dark</title>
+  <script type="text/javascript" src="/blockly_compressed.js"></script>
+  <script type="text/javascript" src="/blocks_compressed.js"></script>
+  <script type="text/javascript" src="/arduino_compressed.js"></script>
+  <script type="text/javascript" src="/msg/js/en.js"></script>
+  <script type="text/javascript" src="/apps/blocklyduino/Blob.js"></script>
+  <script type="text/javascript" src="/apps/blocklyduino/spin.js"></script>
+  <script type="text/javascript" src="/apps/blocklyduino/FileSaver.min.js"></script>
+  <script type="text/javascript" src="/apps/blocklyduino/blockly_helper.js"></script>
+  <script>
+    // Define XML for each level
+    const levelXML = {
+      '1': `<xml xmlns="http://www.w3.org/1999/xhtml"></xml>`,
+      '2': `<xml xmlns="http://www.w3.org/1999/xhtml">
+          <block type="variables_set" id="15" x="488" y="63">
+            <field name="VAR">sensor_value</field>
+          </block>
+          <block type="variables_set" id="5" x="238" y="88">
+            <field name="VAR">temp</field>
+            <value name="VALUE">
+              <block type="math_number" id="36">
+                <field name="NUM">30</field>
+              </block>
+            </value>
+          </block>
+          <block type="variables_get" id="22" x="538" y="112">
+            <field name="VAR">sensor_value</field>
+          </block>
+          <block type="variables_get" id="10" x="287" y="137">
+            <field name="VAR">temp</field>
+          </block>
+        </xml>`,
+      '3': `<xml xmlns="http://www.w3.org/1999/xhtml">
+          <block type="variables_set" id="21" x="288" y="88">
+            <field name="VAR">pir_value</field>
+          </block>
+          <block type="variables_get" id="26" x="343" y="129">
+            <field name="VAR">pir_value</field>
+          </block>
+        </xml>`,
+      '4': `<xml xmlns="http://www.w3.org/1999/xhtml">
+          <block type="variables_set" id="14" x="238" y="37">
+           <field name="VAR">pir_value</field>
+          </block>
+          <block type="variables_get" id="21" x="163" y="87">
+            <field name="VAR">light</field>
+          </block>
+          <block type="variables_get" id="28" x="388" y="87">
+            <field name="VAR">pir_value</field>
+          </block>
+          <block type="variables_set" id="9" x="263" y="138">
+            <field name="VAR">light</field>
+          </block>
+        </xml>`
+    };
+
+    // Define level-specific toolboxes
+    const toolboxXML = {
+      '1': `<xml id="toolbox" style="display: none">
+            <category name="Input/Output">
+                <block type="inout_digital_write"></block>
+            </category>
+        </xml>`,
+      '2': `<xml id="toolbox" style="display: none">
+            <category name="Logic">
+                <block type="controls_if"></block>
+                <block type="logic_compare"></block>
+            </category>
+            <category name="Input/Output">
+                <block type="inout_analog_read"></block>
+                <block type="inout_digital_write"></block>
+                <block type="inout_highlow"></block>
+            </category>
+            <category name="Math">
+                <block type="math_number"></block>
+            </category>
+        </xml>`,
+      '3': `<xml id="toolbox" style="display: none">
+            <category name="Logic">
+                <block type="controls_if"></block>
+                <block type="logic_compare"></block>
+            </category>
+            <category name="Input/Output">
+                <block type="inout_digital_read"></block>
+                <block type="inout_digital_write"></block>
+                <block type="inout_highlow"></block>
+            </category>
+            <category name="Servo">
+                <block type="servo_move"></block>
+                <block type="servo_read_degrees"></block>
+            </category>
+            <category name="Math">
+                <block type="math_number"></block>
+            </category>
+        </xml>`,
+      '4': `<xml id="toolbox" style="display: none">
+          <category name="Logic">
+            <block type="controls_if"></block>
+            <block type="logic_compare"></block>
+          </category>
+          <category name="Input/Output">
+            <block type="inout_digital_read"></block>
+            <block type="inout_analog_read"></block>
+            <block type="inout_digital_write"></block>
+            <block type="inout_highlow"></block>
+          </category>
+          <category name="Math">
+            <block type="math_number"></block>
+          </category>
+        </xml>`
+    };
+
+    // Define level-specific documentation with accordion structure and HTML block representations
+    const levelDocumentation = {
+      '1': [
+        {
+          category: "Input/Output",
+          items: [
+            {
+              title: "Digital Write",
+              description: "Use the Digital Write block to send a HIGH (ON) or LOW (OFF) signal to a digital pin.",
+              codeSnippet: `digitalWrite(pin, state);`
+            }
+          ]
+        }
+      ],
+      '2': [
+        {
+          category: "Logic",
+          items: [
+            {
+              title: "If-Else Block",
+              description: "The 'if-else' block allows your program to make decisions. Code inside 'if' runs if the condition is true, otherwise code inside 'else' runs.",
+              codeSnippet: `if (condition) {\n  // do something\n} else {\n  // do something else\n}`
+            },
+            {
+              title: "Comparison Operators",
+              description: "Compare two values using operators like equals (=), not equals (!=), less than (<), greater than (>), etc. This block returns a boolean (true/false) value.",
+              codeSnippet: `value1 == value2`
+            }
+          ]
+        },
+        {
+          category: "Input/Output",
+          items: [
+            {
+              title: "Analog Read",
+              description: "Reads the analog value from a specified analog pin. This returns a number between 0 and 1023.",
+              codeSnippet: `analogRead(pin);`
+            },
+            {
+              title: "Digital Write (Review)",
+              description: "Control digital pins with HIGH/LOW signals, useful for LEDs.",
+              codeSnippet: `digitalWrite(pin, state);`
+            },
+            {
+              title: "In/Out High/Low",
+              description: "Represents the HIGH (5V) or LOW (0V) states for digital pins, typically used with Digital Read/Write blocks.",
+              codeSnippet: `HIGH / LOW`
+            }
+          ]
+        },
+        {
+          category: "Math",
+          items: [
+            {
+              title: "Number",
+              description: "Represents a numerical value that can be used in calculations or comparisons.",
+              codeSnippet: `123`
+            }
+          ]
+        }
+      ],
+      '3': [
+        {
+          category: "Logic",
+          items: [
+            {
+              title: "If-Else Block",
+              description: "The 'if-else' block allows your program to make decisions. Code inside 'if' runs if the condition is true, otherwise code inside 'else' runs.",
+              codeSnippet: `if (condition) {\n  // do something\n} else {\n  // do something else\n}`
+            },
+            {
+              title: "Comparison Operators", // Changed from "Logic Compare"
+              description: "Compare two values using operators like equals (=), not equals (!=), less than (<), greater than (>), etc. This block returns a boolean (true/false) value.", // Updated description
+              codeSnippet: `item1 == item2` // Aligned code snippet with ComparisonOperators
+            }
+          ]
+        },
+        {
+          category: "Input/Output",
+          items: [
+            {
+              title: "Digital Read",
+              description: "Reads the state of a digital pin, returning HIGH or LOW.",
+              codeSnippet: `digitalRead(pin);`
+            },
+            {
+              title: "Digital Write",
+              description: "Sets the state of a digital pin to HIGH or LOW.",
+              codeSnippet: `digitalWrite(pin, state);`
+            },
+            {
+              title: "In/Out High/Low",
+              description: "Represents the HIGH (5V) or LOW (0V) states for digital pins.",
+              codeSnippet: `HIGH / LOW`
+            }
+          ]
+        },
+        {
+          category: "Servo",
+          items: [
+            {
+              title: "Servo Move",
+              description: "Controls a servo motor to a specific angle (0-180 degrees).",
+              codeSnippet: `servo.write(angle);`
+            },
+            {
+              title: "Servo Read Degrees",
+              description: "Reads the current angle of a servo motor.",
+              codeSnippet: `servo.read();`
+            }
+          ]
+        },
+        {
+          category: "Math",
+          items: [
+            {
+              title: "Number",
+              description: "Represents a numerical value that can be used in calculations or comparisons.",
+              codeSnippet: `123`
+            }
+          ]
+        }
+      ],
+      '4': [
+        {
+          category: "Logic",
+          items: [
+            {
+              title: "If-Else Block",
+              description: "The 'if-else' block allows your program to make decisions. Code inside 'if' runs if the condition is true, otherwise code inside 'else' runs.",
+              codeSnippet: `if (condition) {\n  // do something\n} else {\n  // do something else\n}`
+            },
+            {
+              title: "Comparison Operators", // Changed from "Logic Compare"
+              description: "Compare two values using operators like equals (=), not equals (!!), less than (<), greater than (>), etc. This block returns a boolean (true/false) value.", // Updated description
+              codeSnippet: `item1 == item2` // Aligned code snippet with ComparisonOperators
+            }
+          ]
+        },
+        {
+          category: "Input/Output",
+          items: [
+            {
+              title: "Digital Read",
+              description: "Reads the state of a digital pin, returning HIGH or LOW.",
+              codeSnippet: `digitalRead(pin);`
+            },
+            {
+              title: "Analog Read",
+              description: "Reads the analog value from a specified analog pin (0-1023).",
+              codeSnippet: `analogRead(pin);`
+            },
+            {
+              title: "Digital Write",
+              description: "Sets the state of a digital pin to HIGH or LOW.",
+              codeSnippet: `digitalWrite(pin, state);`
+            },
+            {
+              title: "In/Out High/Low",
+              description: "Represents the HIGH (5V) or LOW (0V) states for digital pins.",
+              codeSnippet: `HIGH / LOW`
+            }
+          ]
+        },
+        {
+          category: "Math",
+          items: [
+            {
+              title: "Number",
+              description: "Represents a numerical value.",
+              codeSnippet: `123`
+            }
+          ]
+        }
+      ]
+    };
+
+    /**
+     * List of tab names.
+     * @private
+     */
+    var TABS_ = ['blocks', 'arduino', 'xml'];
+
+    var selected = 'blocks';
+
+    /**
+     * Switch the visible pane when a tab is clicked.
+     * @param {string} clickedName Name of tab clicked.
+     */
+    function tabClick(clickedName) {
+      if (document.getElementById('tab_xml').className == 'tabon') {
+        var xmlTextarea = document.getElementById('content_xml');
+        var xmlText = xmlTextarea.value;
+        var xmlDom = null;
+        try {
+          xmlDom = Blockly.Xml.textToDom(xmlText);
+        } catch (e) {
+          var q = window.confirm('Error parsing XML:\n' + e + '\n\nAbandon changes?');
+          if (!q) {
+            return;
+          }
+        }
+        if (xmlDom) {
+          Blockly.mainWorkspace.clear();
+          Blockly.Xml.domToWorkspace(Blockly.mainWorkspace, xmlDom);
+        }
+      }
+
+      if (document.getElementById('tab_blocks').className == 'tabon') {
+        Blockly.mainWorkspace.setVisible(false);
+      }
+      for (var i = 0; i < TABS_.length; i++) {
+        var name = TABS_[i];
+        document.getElementById('tab_' + name).className = 'taboff';
+        document.getElementById('content_' + name).style.visibility = 'hidden';
+      }
+
+      selected = clickedName;
+      document.getElementById('tab_' + clickedName).className = 'tabon';
+      document.getElementById('content_' + clickedName).style.visibility = 'visible';
+      renderContent();
+      if (clickedName == 'blocks') {
+        Blockly.mainWorkspace.setVisible(true);
+      }
+      Blockly.fireUiEvent(window, 'resize');
+    }
+
+    /**
+     * Function to reload the current page.
+     * This will effectively reset the BlocklyDuino environment to its initial state.
+     */
+    function resetClick() {
+      location.reload();
+    }
+
+    /**
+     * Clear the Blockly workspace.
+     */
+    function discard() {
+      Blockly.mainWorkspace.clear();
+      renderContent();
+    }
+
+    /**
+     * Populate the currently selected pane with content generated from the blocks.
+     */
+    function renderContent() {
+      var content = document.getElementById('content_' + selected);
+      if (content.id == 'content_blocks') {
+        Blockly.mainWorkspace.render();
+      } else if (content.id == 'content_xml') {
+        var xmlTextarea = document.getElementById('content_xml');
+        var xmlDom = Blockly.Xml.workspaceToDom(Blockly.mainWorkspace);
+        var xmlText = Blockly.Xml.domToPrettyText(xmlDom);
+        xmlTextarea.value = xmlText;
+        xmlTextarea.focus();
+      } else if (content.id == 'content_arduino') {
+        var arduinoTextarea = document.getElementById('content_arduino');
+        arduinoTextarea.value = Blockly.Arduino.workspaceToCode();
+        arduinoTextarea.focus();
+      }
+    }
+
+    /**
+     * Compute the absolute coordinates and dimensions of an HTML element.
+     * @param {!Element} element Element to match.
+     * @return {!Object} Contains height, width, x, and y properties.
+     * @private
+     */
+    function getBBox_(element) {
+      var height = element.offsetHeight;
+      var width = element.offsetWidth;
+      var x = 0;
+      var y = 0;
+      do {
+        x += element.offsetLeft;
+        y += element.offsetTop;
+        element = element.offsetParent;
+      } while (element);
+      return {
+        height: height,
+        width: width,
+        x: x,
+        y: y
+      };
+    }
+
+    /**
+     * Renders the documentation content in an accordion style.
+     */
+    function renderDocumentationContent() {
+      const docSection = document.getElementById('blocklyDuino_documentation');
+      const match = window.location.pathname.match(/\/level\/(\d+)/);
+      const level = match ? match[1] : '1';
+      const documentationData = levelDocumentation[level] || [];
+
+      docSection.innerHTML = ''; // Clear existing content
+
+      if (documentationData.length === 0) {
+        docSection.innerHTML = '<p class="no-doc-message">No documentation available for this level.</p>';
+        return;
+      }
+
+      docSection.innerHTML += `<h2 class="documentation-title">Level ${level} Documentation </h2>`;
+
+      documentationData.forEach(categoryData => {
+        const categoryDiv = document.createElement('div');
+        categoryDiv.classList.add('accordion-category');
+
+        const header = document.createElement('div');
+        header.classList.add('accordion-header');
+        header.innerHTML = `<span class="toggle-icon">+</span> ${categoryData.category}`;
+        categoryDiv.appendChild(header);
+
+        const contentDiv = document.createElement('div');
+        contentDiv.classList.add('accordion-content');
+        contentDiv.style.display = 'none'; // Initially hidden
+
+        categoryData.items.forEach(item => {
+          const itemDiv = document.createElement('div');
+          itemDiv.classList.add('accordion-item');
+
+          // Safely parse HTML content (block image/video)
+          const mockBlockContainer = document.createElement('div');
+          mockBlockContainer.classList.add('mock-block-container');
+          mockBlockContainer.innerHTML = item.htmlBlockRepresentation || '';
+
+          itemDiv.innerHTML = `
+                        <h3>${item.title}</h3>
+                        <p>${item.description}</p>
+                        <div class="code-snippet">
+                            <pre><code>${item.codeSnippet}</code></pre>
+                        </div>
+                    `;
+
+          // itemDiv.insertBefore(mockBlockContainer, itemDiv.children[1]); // REMOVE THIS LINE
+          contentDiv.appendChild(itemDiv);
+        });
+
+        categoryDiv.appendChild(contentDiv);
+        docSection.appendChild(categoryDiv);
+
+        // Add click listener to header
+        header.addEventListener('click', () => {
+          const isOpen = contentDiv.style.display === 'block';
+          contentDiv.style.display = isOpen ? 'none' : 'block';
+          header.querySelector('.toggle-icon').textContent = isOpen ? '+' : '–';
+          header.classList.toggle('active', !isOpen); // Toggle active class for header
+        });
+      });
+    }
+/* next verion ********************
+function renderDocumentationContent() {
+      const docSection = document.getElementById('blocklyDuino_documentation');
+      const match = window.location.pathname.match(/\/level\/(\d+)/);
+      const level = match ? match[1] : '1';
+      const documentationData = levelDocumentation[level] || [];
+
+      docSection.innerHTML = ''; // Clear existing content
+
+      if (documentationData.length === 0) {
+        docSection.innerHTML = '<p class="no-doc-message">No documentation available for this level.</p>';
+        return;
+      }
+
+      docSection.innerHTML += `<h2 class="documentation-title">Level ${level} Documentation </h2>`;
+
+      documentationData.forEach(categoryData => {
+        const categoryDiv = document.createElement('div');
+        categoryDiv.classList.add('accordion-category');
+
+        const header = document.createElement('div');
+        header.classList.add('accordion-header');
+        header.innerHTML = `<span class="toggle-icon">+</span> ${categoryData.category}`;
+        categoryDiv.appendChild(header);
+
+        const contentDiv = document.createElement('div');
+        contentDiv.classList.add('accordion-content');
+        contentDiv.style.display = 'none'; // Initially hidden
+
+        categoryData.items.forEach(item => {
+          const itemDiv = document.createElement('div');
+          itemDiv.classList.add('accordion-item');
+
+          // Safely parse HTML content (block image/video)
+          const mockBlockContainer = document.createElement('div');
+          mockBlockContainer.classList.add('mock-block-container');
+          mockBlockContainer.innerHTML = item.htmlBlockRepresentation || '';
+
+          itemDiv.innerHTML = `
+                <h3>${item.title}</h3>
+                <p>${item.description}</p>
+                <div class="code-snippet">
+                    <pre><code>${item.codeSnippet}</code></pre>
+                </div>
+            `;
+
+          itemDiv.insertBefore(mockBlockContainer, itemDiv.children[1]);
+          contentDiv.appendChild(itemDiv);
+        });
+
+        categoryDiv.appendChild(contentDiv);
+        docSection.appendChild(categoryDiv);
+
+        // Add click listener to header
+        header.addEventListener('click', () => {
+          const isOpen = contentDiv.style.display === 'block';
+          contentDiv.style.display = isOpen ? 'none' : 'block';
+          header.querySelector('.toggle-icon').textContent = isOpen ? '+' : '–';
+          header.classList.toggle('active', !isOpen); // Toggle active class for header
+        });
+      });
+    }
+
+*/
+    // NEW CODE START: levelHints and renderHelpContent functions from your first prompt
+    const levelHints = {
+      '1': ["Use DigitalWrite to set port 13 to HIGH to turn on the LED."],
+      '2': [
+        "Use AnalogRead to read a value from the temperature sensor on port A0 and store this value in the variable sensor_value.",
+        "Use the if-else block to compare sensor_value and temp.",
+        "If sensor_value is greater than temp, send a signal to digital port number 9.",
+        "Else, send a stop signal to the same port."
+      ],
+      '3': [
+        "Use DigitalRead to read the motion sensor status from port 2 and store this value in the variable pir_value.",
+        "Use if-else to check whether the pir_value is HIGH.",
+        "If there is movement, move the servo (PIN 6) to 90 degrees.",
+        "If there is no movement, reset the servo to 0 degrees.",
+        "At the end, send a HIGH signal to digital port number 12."
+      ],
+      '4': [
+        "Read the light from A0 using AnalogRead and store it in the variable light.",
+        "Read the movement from D2 using DigitalRead and store it in pir_value.",
+        "Check: If the lighting is low (LOW):",
+        "Check the movement status:",
+        "If HIGH: Set ports 6, 9, and 12 to HIGH.",
+        "If LOW: Set them to LOW.",
+        "If the lighting is not low, stop all ports (LOW).",
+        "Use two blocks of if-else condition, one for the light and inside it one for the motion sensor."
+      ]
+    };
+
+    function renderHelpContent_Alternative() {
+      const match = window.location.pathname.match(/\/level\/(\d+)/);
+      const level = match ? match[1] : '1';
+      const hints = levelHints[level] || ["No help available for this level."];
+
+      const modalContent = document.querySelector('.modal-content');
+
+      // Clear previous content
+      modalContent.innerHTML = '';
+
+      // Create and append the close button
+      const closeButton = document.createElement('span');
+      closeButton.classList.add('close-button');
+      closeButton.textContent = '×';
+      closeButton.onclick = closeModal;
+      modalContent.appendChild(closeButton);
+
+      // Create and append the title
+      const title = document.createElement('h2');
+      title.textContent = `Help for Level ${level}`;
+      modalContent.appendChild(title);
+
+      // Create and append the help content container
+      const helpDiv = document.createElement('div');
+      helpDiv.id = 'helpContent';
+      modalContent.appendChild(helpDiv);
+
+      // Create and append the ordered list for hints
+      const ol = document.createElement('ol');
+      hints.forEach(hint => {
+        const li = document.createElement('li');
+        li.textContent = hint;
+        ol.appendChild(li);
+      });
+      helpDiv.appendChild(ol);
+
+      document.getElementById('modal').style.display = 'flex'; // Use 'flex' to center content
+      document.getElementById('modal').classList.remove('hidden');
+    }
+
+
+
+    function closeModal() {
+      const modal = document.getElementById('modal');
+      modal.style.display = 'none';
+    }
+    // NEW CODE END
+
+    /**
+     * Initialize Blockly. Called on page load.
+     */
+    function init() {
+      var container = document.getElementById('content_area');
+      var onresize = function (e) {
+        var bBox = getBBox_(container);
+        for (var i = 0; i < TABS_.length; i++) {
+          var el = document.getElementById('content_' + TABS_[i]);
+          el.style.top = bBox.y + 'px';
+          el.style.left = bBox.x + 'px';
+          el.style.height = bBox.height + 'px';
+          el.style.height = (2 * bBox.height - el.offsetHeight) + 'px';
+          el.style.width = bBox.width + 'px';
+          el.style.width = (2 * bBox.width - el.offsetWidth) + 'px';
+        }
+        if (Blockly.mainWorkspace.toolbox_.width) {
+          document.getElementById('tab_blocks').style.minWidth =
+            (Blockly.mainWorkspace.toolbox_.width - 38) + 'px';
+        }
+      };
+      window.addEventListener('resize', onresize, false);
+
+      // Extract level from URL
+      const match = window.location.pathname.match(/\/level\/(\d+)/);
+      const level = match ? match[1] : '1';
+
+      // Render the documentation content
+      renderDocumentationContent();
+
+
+      // Select toolbox for the current level
+      const toolboxText = toolboxXML[level] || toolboxXML['1'];
+      const parser = new DOMParser();
+      const toolboxDom = parser.parseFromString(toolboxText, 'text/xml');
+      const toolboxElement = toolboxDom.getElementById('toolbox');
+
+      // Inject Blockly with the level-specific toolbox
+      Blockly.inject(document.getElementById('content_blocks'), {
+        grid: {
+          spacing: 25,
+          length: 3,
+          colour: '#e6f3ff',
+          snap: true
+        },
+        media: '../../media/',
+        toolbox: toolboxElement
+      });
+
+      auto_save_and_restore_blocks();
+
+      // Load level-specific workspace
+      const xmlText = levelXML[level];
+      if (xmlText) {
+        discard(); // Use the new discard function that clears and re-renders
+        const xmlDom = Blockly.Xml.textToDom(xmlText);
+        Blockly.Xml.domToWorkspace(Blockly.mainWorkspace, xmlDom);
+      } else {
+        console.error('Invalid level:', level);
+      }
+
+      // Automatically show help on page load
+      renderHelpContent_Alternative();
+    }
+
+    /**
+     * Send generated Arduino code to GDevelop.
+     */
+    function sendCodeToGDevelop() {
+      if (typeof Blockly !== "undefined" && Blockly.mainWorkspace) {
+        let generatedCode = Blockly.Arduino.workspaceToCode(Blockly.mainWorkspace);
+        console.log("Generated Arduino Code:", generatedCode);
+        window.parent.postMessage({
+          type: "blocklyCode",
+          code: generatedCode
+        }, "*");
+        
+      } else {
+        console.error("Blockly or workspace is not defined.");
+       
+      }
+    }
+
+    // Show notification function
+    function showNotification(message, type) {
+      const notification = document.createElement('div');
+      notification.className = `notification ${type}`;
+      notification.textContent = message;
+      document.body.appendChild(notification);
+      setTimeout(() => {
+        notification.classList.add('show');
+      }, 100);
+      setTimeout(() => {
+        notification.classList.remove('show');
+        setTimeout(() => {
+          document.body.removeChild(notification);
+        }, 300);
+      }, 3000);
+    }
+
+    // When the DOM is fully loaded, set up the extract button
+    document.addEventListener("DOMContentLoaded", function () {
+      var extractButton = document.getElementById("extractCodeButton");
+      if (extractButton) {
+        extractButton.onclick = sendCodeToGDevelop;
+        console.log("✅ Extract button linked successfully!");
+      } else {
+        console.error("❌ Extract button NOT found! Check the HTML ID.");
+      }
+
+      // Link the new toggle documentation button
+      var toggleDocButton = document.getElementById("toggleDocumentationButton");
+      if (toggleDocButton) {
+        toggleDocButton.onclick = toggleDocumentation;
+        console.log("✅ Toggle Documentation button linked successfully!");
+      } else {
+        console.error("❌ Toggle Documentation button NOT found! Check the HTML ID.");
+      }
+
+      // Link the new help button
+      var showHelpButton = document.getElementById("showHelpButton");
+      if (showHelpButton) {
+        showHelpButton.onclick = renderHelpContent_Alternative;
+        console.log("✅ Show Help button linked successfully!");
+      } else {
+        console.error("❌ Show Help button NOT found! Check the HTML ID.");
+      }
+
+      // Link the close button for the help message box (now used by the modal)
+      var closeHelpButton = document.getElementById("closeHelpBox");
+      if (closeHelpButton) {
+        closeHelpButton.onclick = closeModal;
+        console.log("✅ Close Help button linked successfully!");
+      } else {
+        console.error("❌ Close Help button NOT found! Check the HTML ID.");
+      }
+    });
+
+    // Initialize the click counter
+    let clickCounter = 0;
+
+    // Function that computes and sends the click count to GDevelop
+    function computeClickCount() {
+      clickCounter++;
+      console.log("Total clicks:", clickCounter);
+
+      // Update the count display on the page
+      const displayElement = document.getElementById("clickDisplay");
+      if (displayElement) {
+        displayElement.textContent = "Clicks: " + clickCounter;
+      }
+
+      // Send the updated click count to GDevelop
+      function sendClicksToGDevelop() {
+        window.parent.postMessage({
+          type: "clickCount",
+          clicks: clickCounter
+        }, "*");
+      }
+
+      sendClicksToGDevelop();
+    }
+
+    // Attach the event listener to the whole page
+    document.addEventListener("click", computeClickCount);
+
+    // Expose a function to retrieve the click count
+    function getClickCount() {
+      return clickCounter;
+    }
+
+    /**
+     * Toggles the visibility of the documentation section.
+     */
+    function toggleDocumentation() {
+      const documentationSection = document.getElementById('blocklyDuino_documentation');
+      const contentSection = document.getElementById('blocklyDuino_content');
+      if (documentationSection.style.display === 'none') {
+        documentationSection.style.display = 'block';
+        contentSection.style.flex = '0 0 70%';
+        documentationSection.style.flex = '0 0 30%';
+        // Ensure content section width adapts if not already handled by flex
+        if (window.innerWidth <= 768) {
+          contentSection.classList.remove('full-width-mobile');
+        }
+      } else {
+        documentationSection.style.display = 'none';
+        contentSection.style.flex = '1'; // Expand content to full width
+        if (window.innerWidth <= 768) {
+          contentSection.classList.add('full-width-mobile');
+        }
+      }
+      // Re-render Blockly workspace to adjust to new container size
+      Blockly.fireUiEvent(window, 'resize');
+    }
+window.addEventListener("message", function (event) {
+  if (event.data && event.data.type === "blocklyFeedback") {
+    const feedback = event.data.message;
+
+    console.log("✅ Received feedback from GDevelop:", feedback);
+
+    // Show popup notification
+    showNotification(feedback, feedback === "Correct!" ? "success" : "error");
+
+    // Optional persistent message
+    const box = document.getElementById("feedbackBox");
+    if (box) {
+      box.textContent = feedback;
+      box.style.display = "block";
+    }
+  }
+});
+
+
+  </script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      height: 100%;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      overflow: hidden;
+      color: #333;
+    }
+
+    #main_container {
+      display: flex;
+      flex-direction: row;
+      height: 100vh;
+    }
+
+    #blocklyDuino_content {
+      flex: 0 0 70%;
+      overflow: auto;
+    }
+
+    /* Documentation Styling */
+    #blocklyDuino_documentation {
+      flex: 0 0 30%;
+      padding: 20px;
+      /* Adjust padding for overall section */
+      background: #f8faff;
+      /* Matches content_blocks background */
+      overflow-y: auto;
+      /* Enable scrolling for content */
+      color: #2c3e50;
+      position: relative;
+    }
+
+    .documentation-title {
+      color: #2980b9;
+      margin-top: 0;
+      margin-bottom: 25px;
+      /* More space below title */
+      font-size: 28px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      border-bottom: 3px solid #667eea;
+      padding-bottom: 12px;
+      position: relative;
+    }
+
+    .documentation-title::after {
+      content: '✨';
+      position: absolute;
+      right: 0;
+      bottom: 8px;
+      font-size: 20px;
+    }
+
+
+    .accordion-category {
+      margin-bottom: 15px;
+      /* Space between categories */
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+      /* Subtle shadow for each category */
+    }
+
+    .accordion-header {
+      background: #ffffff;
+      /* White background for header */
+      padding: 15px 20px;
+      font-size: 18px;
+      font-weight: 600;
+      color: #34495e;
+      /* Dark text for header */
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      border-bottom: 1px solid #eee;
+      /* Light separator */
+      transition: background 0.3s ease;
+    }
+
+    .accordion-header:hover {
+      background: #f0f8ff;
+      /* Light hover effect */
+    }
+
+    .accordion-header .toggle-icon {
+      font-size: 24px;
+      font-weight: bold;
+      margin-right: 10px;
+      color: #667eea;
+      /* Color for +/- icon */
+      line-height: 1;
+      /* Ensures vertical alignment */
+      transition: transform 0.2s ease;
+    }
+
+    .accordion-header.active .toggle-icon {
+      transform: rotate(45deg);
+      /* Optional: animate + to X or similar */
+    }
+
+    .accordion-content {
+      padding: 20px;
+      background: #fdfdfd;
+      /* Very light background for content */
+      border-top: none;
+      color: #3b506b;
+    }
+
+    .accordion-item h3 {
+      color: #3498db;
+      /* Brighter blue for item titles */
+      margin-top: 0;
+      /* Remove default h3 top margin */
+      margin-bottom: 10px;
+      font-size: 20px;
+      font-weight: 600;
+      border-bottom: 1px dotted #aed6f1;
+      /* Dotted line */
+      padding-bottom: 5px;
+    }
+
+    .accordion-item p {
+      margin-bottom: 15px;
+      font-size: 15px;
+      line-height: 1.6;
+    }
+
+    .mock-block-container {
+      display: flex;
+      justify-content: center;
+      /* Center the mock block */
+      padding: 15px 0;
+      background-color: #f0f4f7;
+      /* Light background for the container */
+      border-radius: 8px;
+      margin-bottom: 15px;
+      box-shadow: inset 0 0 8px rgba(0, 0, 0, 0.05);
+      /* Inner shadow for depth */
+    }
+
+    /* Style for the actual image block */
+    .actual-block-image {
+      max-width: 100%;
+      /* Ensure image fits container */
+      height: auto;
+      /* Maintain aspect ratio */
+      display: block;
+      /* Remove extra space below image */
+      border-radius: 4px;
+      /* Slight roundness if needed */
+      box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.15);
+      /* Subtle shadow for the image */
+      pointer-events: none;
+      /* Make the image unfunctional */
+    }
+
+    /* Style for the actual video block */
+    .actual-block-video {
+      max-width: 100%;
+      /* Ensure video fits container */
+      height: auto;
+      /* Maintain aspect ratio */
+      display: block;
+      /* Remove extra space below video */
+      border-radius: 4px;
+      /* Slight roundness if needed */
+      box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.15);
+      /* Subtle shadow for the video */
+      pointer-events: none;
+      /* Make the video unfunctional */
+    }
+
+
+    /* All mock-block related CSS classes have been removed as they are no longer needed */
+
+
+    .code-snippet {
+      background-color: #f0f4f7;
+      /* Light background for code/block examples */
+      border-left: 4px solid #764ba2;
+      /* Purple accent bar */
+      padding: 10px 15px;
+      margin-bottom: 15px;
+      border-radius: 4px;
+      font-family: 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, 'Courier New', monospace;
+      font-size: 14px;
+      overflow-x: auto;
+      /* Allow horizontal scrolling for long lines */
+    }
+
+    .code-snippet pre {
+      margin: 0;
+      white-space: pre-wrap;
+      /* Wrap long lines */
+      word-wrap: break-word;
+    }
+
+    .no-doc-message {
+      text-align: center;
+      padding: 50px 20px;
+      font-size: 18px;
+      color: #667eea;
+      font-weight: 500;
+    }
+
+
+    .header-container {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+      box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
+    }
+
+    h1 {
+      font-weight: 700;
+      font-size: 24px;
+      margin: 0;
+      padding: 15px 20px;
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    h1::before {
+      content: "🔧";
+      font-size: 28px;
+      -webkit-text-fill-color: initial;
+    }
+
+    #tabRow {
+      background: rgba(255, 255, 255, 0.9);
+      backdrop-filter: blur(10px);
+    }
+
+    #tabRow>td {
+      border: none;
+      position: relative;
+    }
+
+    .tabon {
+      background: linear-gradient(135deg, #667eea, #764ba2) !important;
+      color: white !important;
+      padding: 12px 24px !important;
+      border-radius: 8px 8px 0 0 !important;
+      font-weight: 600;
+      box-shadow: 0 -2px 10px rgba(102, 126, 234, 0.3);
+      transform: translateY(-2px);
+      transition: all 0.3s ease;
+    }
+
+    .taboff {
+      cursor: pointer;
+      padding: 12px 24px;
+      color: #666;
+      font-weight: 500;
+      transition: all 0.3s ease;
+      border-radius: 8px 8px 0 0;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .taboff::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(102, 126, 234, 0.1), transparent);
+      transition: left 0.5s;
+    }
+
+    .taboff:hover {
+      background: rgba(102, 126, 234, 0.1);
+      color: #667eea;
+      transform: translateY(-1px);
+    }
+
+    .taboff:hover::before {
+      left: 100%;
+    }
+
+    .tabmin {
+      border: none !important;
+      width: 10px;
+    }
+
+    .tabmax {
+      border: none !important;
+      width: 99%;
+      text-align: right;
+      padding: 12px 20px;
+      background: rgba(255, 255, 255, 0.9);
+    }
+
+    button {
+      padding: 10px 20px;
+      font-size: 14px;
+      font-weight: 500;
+      border-radius: 8px;
+      border: none;
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      color: white;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 2px 10px rgba(102, 126, 234, 0.3);
+      margin: 0 5px;
+      font-family: inherit;
+      position: relative;
+      overflow: hidden;
+    }
+
+    button::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+      transition: left 0.5s;
+    }
+
+    button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 20px rgba(102, 126, 234, 0.4);
+    }
+
+    button:active {
+      transform: translateY(0);
+      box-shadow: 0 2px 10px rgba(102, 126, 234, 0.3);
+    }
+
+    #extractCodeButton {
+      background: linear-gradient(135deg, #4CAF50, #45a049);
+      box-shadow: 0 2px 10px rgba(76, 175, 80, 0.3);
+    }
+
+    #extractCodeButton:hover {
+      box-shadow: 0 4px 20px rgba(76, 175, 80, 0.4);
+    }
+
+    #extractCodeButton::before {
+      content: "📤 ";
+      margin-right: 5px;
+    }
+
+    #toggleDocumentationButton {
+      background: linear-gradient(135deg, #ff9800, #fb8c00);
+      /* Orange */
+      box-shadow: 0 2px 10px rgba(255, 152, 0, 0.3);
+    }
+
+    #toggleDocumentationButton:hover {
+      box-shadow: 0 4px 20px rgba(255, 152, 0, 0.4);
+    }
+
+    #toggleDocumentationButton::before {
+      content: "📚 ";
+      margin-right: 5px;
+    }
+
+    #showHelpButton {
+      background: linear-gradient(135deg, #007bff, #0056b3);
+      /* Blue */
+      box-shadow: 0 2px 10px rgba(0, 123, 255, 0.3);
+    }
+
+    #showHelpButton:hover {
+      box-shadow: 0 4px 20px rgba(0, 123, 255, 0.4);
+    }
+
+    #showHelpButton::before {
+      content: "❓ ";
+      margin-right: 5px;
+    }
+
+    table {
+      border-collapse: collapse;
+      margin: 0;
+      padding: 0;
+      border: none;
+      width: 100%;
+    }
+
+    td {
+      padding: 0;
+      vertical-align: top;
+    }
+
+    .content {
+      visibility: hidden;
+      margin: 0;
+      padding: 0;
+      position: absolute;
+      direction: ltr;
+      background: white;
+      border-radius: 0 8px 8px 8px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    }
+
+    #content_blocks {
+      padding: 0;
+      background: #f8faff;
+    }
+
+    .blocklySvg {
+      border: none !important;
+      border-radius: 0 8px 8px 8px !important;
+    }
+
+    #content_arduino,
+    #content_xml {
+      resize: none;
+      outline: none;
+      border: none;
+      font-family: 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, 'Courier New', monospace;
+      font-size: 14px;
+      line-height: 1.5;
+      padding: 20px;
+      background: #1e1e1e;
+      color: #d4d4d4;
+      overflow: auto;
+      border-radius: 0 8px 8px 8px;
+    }
+
+    #content_arduino {
+      background: #0d1117;
+      color: #c9d1d9;
+    }
+
+    #content_arduino::-webkit-scrollbar,
+    #content_xml::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+
+    #content_arduino::-webkit-scrollbar-track,
+    #content_xml::-webkit-scrollbar-track {
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 4px;
+    }
+
+    #content_arduino::-webkit-scrollbar-thumb,
+    #content_xml::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.3);
+      border-radius: 4px;
+    }
+
+    #content_arduino::-webkit-scrollbar-thumb:hover,
+    #content_xml::-webkit-scrollbar-thumb:hover {
+      background: rgba(255, 255, 255, 0.5);
+    }
+
+    .notification {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      padding: 15px 20px;
+      border-radius: 8px;
+      color: white;
+      font-weight: 500;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+      transform: translateX(350px);
+      transition: transform 0.3s ease;
+      z-index: 10000;
+      max-width: 300px;
+    }
+
+    .notification.success {
+      background: linear-gradient(135deg, #4CAF50, #45a049);
+    }
+
+    .notification.error {
+      background: linear-gradient(135deg, #f44336, #d32f2f);
+    }
+
+    .notification.show {
+      transform: translateX(0);
+    }
+
+    @keyframes pulse {
+      0% {
+        transform: scale(1);
+      }
+
+      50% {
+        transform: scale(1.05);
+      }
+
+      100% {
+        transform: scale(1);
+      }
+    }
+
+    .loading {
+      animation: pulse 2s infinite;
+    }
+
+    /* Original helpMessageBox CSS, now acting as the modal */
+    #modal {
+      /* Renamed from #helpMessageBox */
+      display: none;
+      /* Hidden by default */
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.5);
+      /* Semi-transparent background overlay */
+      z-index: 10000;
+      /* Ensure it's above everything else */
+      justify-content: center;
+      align-items: center;
+    }
+
+
+    .modal-content {
+      /* New class for the inner content of the modal */
+      background-color: #ffffff;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+      z-index: 10001;
+      max-width: 600px;
+      width: 90%;
+      text-align: left;
+      animation: fadeInScale 0.3s ease-out forwards;
+      border: 1px solid #e0e0e0;
+      position: relative;
+      /* Needed for close button positioning */
+
+    }
+
+    .modal-content h2 {
+      /* Targeting h2 within the modal content */
+      margin-top: 0;
+      color: #333;
+      font-size: 24px;
+      border-bottom: 2px solid #667eea;
+      padding-bottom: 10px;
+      margin-bottom: 20px;
+    }
+
+    .modal-content p {
+      /* Targeting p within the modal content */
+      font-size: 16px;
+      line-height: 1.6;
+      color: #555;
+    }
+
+    .modal-content ul {
+      /* Targeting ul within the modal content */
+      margin-left: 20px;
+      padding-left: 0;
+      list-style-type: disc;
+      color: #555;
+    }
+
+    .modal-content ul li {
+      /* Targeting li within the modal content */
+      margin-bottom: 8px;
+    }
+
+    .modal-content ol {
+      /* Adding styling for ordered lists for hints */
+      margin-left: 20px;
+      padding-left: 0;
+      list-style-type: decimal;
+      color: #555;
+    }
+
+    .modal-content ol li {
+      /* Styling for hints list items */
+      margin-bottom: 8px;
+      font-size: 16px;
+      line-height: 1.6;
+    }
+
+    .close-button {
+      position: absolute;
+      top: 15px;
+      right: 20px;
+      font-size: 28px;
+      font-weight: bold;
+      color: #888;
+      cursor: pointer;
+      transition: color 0.3s ease;
+      line-height: 1;
+      /* Ensures "X" is vertically centered */
+    }
+
+    .close-button:hover {
+      color: #333;
+    }
+
+@keyframes fadeInScale {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+    @media (max-width: 768px) {
+      h1 {
+        font-size: 20px;
+        padding: 12px 15px;
+      }
+
+      .tabon,
+      .taboff {
+        padding: 10px 16px !important;
+        font-size: 14px;
+      }
+
+      button {
+        padding: 8px 16px;
+        font-size: 13px;
+        margin: 0 3px;
+      }
+
+      .tabmax {
+        padding: 10px 15px;
+      }
+
+      #main_container {
+        flex-direction: column;
+      }
+
+      #blocklyDuino_content,
+      #blocklyDuino_documentation {
+        flex: 0 0 100%;
+        height: 50vh;
+      }
+
+      #blocklyDuino_documentation {
+        padding: 15px;
+      }
+
+      .documentation-title {
+        font-size: 24px;
+      }
+
+      .accordion-header {
+        font-size: 16px;
+        padding: 12px 15px;
+      }
+
+      .accordion-content {
+        padding: 15px;
+      }
+
+      .accordion-item h3 {
+        font-size: 18px;
+      }
+
+      .mock-block-container {
+        padding: 10px 0;
+      }
+
+      .actual-block-image,
+      .actual-block-video {
+        /* Adjustments for mobile if needed */
+      }
+
+
+      .code-snippet {
+        font-size: 13px;
+        padding: 8px 12px;
+      }
+
+      /* Adjust modal for mobile */
+
+      #modal .modal-content {
+        /* Target the inner content for mobile adjustments */
+        padding: 20px;
+        max-width: 95%;
+        width: auto;
+      }
+
+      .close-button {
+        font-size: 24px;
+        top: 10px;
+        right: 15px;
+      }
+    }
+
+    /* Keep the media query for when documentation is hidden */
+    @media (max-width: 768px) {
+      #blocklyDuino_content.full-width-mobile {
+        flex: 1;
+        /* Take full width when documentation is hidden on mobile */
+      }
+    }
+
+    [style*="display: none"] {
+      display: none !important;
+    }
+  </style>
+</head>
+
+<body onload="init()">
+  <section id="main_container">
+    <section id="blocklyDuino_content">
+      <table height="100%" width="100%">
+        <tr>
+          <td class="header-container">
+            <h1>SMART IN THE DARK</h1>
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <table width="100%">
+              <tr id="tabRow" height="1em">
+                <td id="tab_blocks" class="tabon" onclick="tabClick('blocks')">🧩 Blocks</td>
+                <td class="tabmin">&nbsp;</td>
+                <td id="tab_arduino" class="taboff" onclick="tabClick('arduino')">⚡ Arduino</td>
+                <td class="tabmin">&nbsp;</td>
+                <td id="tab_xml" class="taboff" onclick="tabClick('xml')" style="display: none;">XML</td>
+                <td class="tabmax">
+                  <button type="button" onclick="uploadClick()" style="display: none;">Upload</button>
+                  <button type="button" onclick="resetClick()" >Reset</button>
+                  <button onclick="discard()"style="display: none;">🗑️ Clear</button>
+                  <button onclick="saveCode()" style="display: none;">Save Arduino Code</button>
+                  <button onclick="save()" style="display: none;">Save XML</button>
+                  <button id="fakeload" style="display: none;">Load XML</button>
+                  <button id="toggleDocumentationButton">documentation</button>
+                  <button id="showHelpButton">Help</button>
+                  <button id="extractCodeButton">Upload to Arduino</button>
+                  <input type="file" id="load" style="display: none;" />
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+        <tr>
+          <td height="99%" id="content_area"></td>
+        </tr>
+      </table>
+      <div id="content_blocks" class="content"></div>
+      <textarea id="content_arduino" class="content" readonly wrap="off"></textarea>
+      <textarea id="content_xml" class="content" wrap="off"></textarea>
+    </section>
+    <section id="blocklyDuino_documentation"></section>
+
+    <div id="modal">
+      <div class="modal-content"> </div>
+    </div>
+  </section>
+</body>
+
+</html>
