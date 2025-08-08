@@ -230,7 +230,8 @@ Thanks to: Neil Fraser, Q.Neutron, Dale Low, Seeeduino, Arduino, contributors of
 
 Hatem Merabtine ([@HATEMMerabtine](https://github.com/HATEMMerabtine))  
 Lead developer of the level-based learning environment and GDevelop integration.
-**Project Supervisor**  
+
+Project Supervisor
 Dr. Rida Mezghache ([@Rida-Mezghache](https://github.com/Rida-Mezghache))  
 Provided conceptual design, feature guidance, and documentation strategy.
 
