@@ -204,6 +204,8 @@ Here is a summary of the tools and tasks for each level as defined in the enviro
 
 ## 7. Running Locally
 
+**Note:** Please use **Mozilla Firefox** to run this project locally, as it is currently incompatible with the latest versions of Chrome-based browsers.
+
 Clone the repository and open:
 
 ```bash
