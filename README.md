@@ -1,6 +1,10 @@
 
 # BlocklyDuino Custom Learning Environment
 
+
+** IMPORTANT BROWSER COMPATIBILITY NOTICE:**
+Due to the latest updates in Chrome-based browsers, this project currently runs **only on Mozilla Firefox**. Please ensure you are using Firefox to access and interact with the environment.
+
 ## 1. Project Overview
 
 This project is a major evolution of the classic [BlocklyDuino](https://github.com/BlocklyDuino/BlocklyDuino), transforming it into a structured, level-based learning environment ideal for integration into educational platforms and gamified tools like **GDevelop**.
