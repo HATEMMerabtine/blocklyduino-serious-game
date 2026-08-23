@@ -2,7 +2,7 @@
 # BlocklyDuino Custom Learning Environment
 
 
-** IMPORTANT BROWSER COMPATIBILITY NOTICE:**
+**IMPORTANT BROWSER COMPATIBILITY NOTICE:**
 Due to the latest updates in Chrome-based browsers, this project currently runs **only on Mozilla Firefox**. Please ensure you are using Firefox to access and interact with the environment.
 
 ## 1. Project Overview
