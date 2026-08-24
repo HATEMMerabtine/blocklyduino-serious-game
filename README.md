@@ -16,6 +16,8 @@
 >
 > ▶️ **Play the ported game online:** [https://blocklyduino-sitd.netlify.app/level/index.html?level=1](https://blocklyduino-sitd.netlify.app/level/index.html?level=1)
 >
+> 📦 **Ported project source code:** [Rida-Mezghache/blocklyduino-serious-game2](https://github.com/Rida-Mezghache/blocklyduino-serious-game2)
+>
 > This repository is kept as an archive/reference for the original v1-based implementation.
 
 ## 1. Project Overview
@@ -255,9 +257,9 @@ Thanks to: Neil Fraser, Q.Neutron, Dale Low, Seeeduino, Arduino, contributors of
 Hatem Merabtine ([@HATEMMerabtine](https://github.com/HATEMMerabtine))  
 Lead developer of the level-based learning environment and GDevelop integration.
 
-Project Supervisor
+Project Lead & Maintainer
 Dr. Rida Mezghache ([@Rida-Mezghache](https://github.com/Rida-Mezghache))  
-Provided conceptual design, feature guidance, and documentation strategy.
+Conceptual design, pedagogical direction, and supervision of both this version and its BlocklyDuino v2 migration ([blocklyduino-serious-game2](https://github.com/Rida-Mezghache/blocklyduino-serious-game2)).
 
 ---
 
