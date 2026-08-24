@@ -1,9 +1,20 @@
 
 # BlocklyDuino Custom Learning Environment
 
+## ⚠️ Project Migrated to BlocklyDuino v2
 
-**IMPORTANT BROWSER COMPATIBILITY NOTICE:**
-Due to the latest updates in Chrome-based browsers, this project currently runs **only on Mozilla Firefox**. Please ensure you are using Firefox to access and interact with the environment.
+> **This version is no longer actively maintained.** Following a recent update of Chromium-based browsers, drag-and-drop stopped working reliably with the old Blockly v1 core used here. The project has therefore been **migrated to [BlocklyDuino v2](https://github.com/BlocklyDuino/BlocklyDuino/tree/v2)**, where drag-and-drop works correctly on current browsers.
+>
+> The full learning environment was ported to the new core, including:
+>
+> -   All 4 levels with their level-specific toolboxes and pre-defined workspaces
+> -   The documentation panel, help modal and notifications
+> -   The complete GDevelop `postMessage` bridge (`blocklyCode`, `clickCount`, `blocklyFeedback`)
+> -   Level access via URL query parameter: `level/index.html?level=1` … `level/index.html?level=4`
+>
+> 🔗 **New base project:** [BlocklyDuino/BlocklyDuino (v2 branch)](https://github.com/BlocklyDuino/BlocklyDuino/tree/v2) — online demo: [https://blocklyduino.github.io/BlocklyDuino/v2/](https://blocklyduino.github.io/BlocklyDuino/v2/)
+>
+> This repository is kept as an archive/reference for the original v1-based implementation.
 
 ## 1. Project Overview
 
@@ -203,8 +214,6 @@ Here is a summary of the tools and tasks for each level as defined in the enviro
 ---
 
 ## 7. Running Locally
-
-**Note:** Please use **Mozilla Firefox** to run this project locally, as it is currently incompatible with the latest versions of Chrome-based browsers.
 
 Clone the repository and open:
 
