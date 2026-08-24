@@ -14,6 +14,8 @@
 >
 > 🔗 **New base project:** [BlocklyDuino/BlocklyDuino (v2 branch)](https://github.com/BlocklyDuino/BlocklyDuino/tree/v2) — online demo: [https://blocklyduino.github.io/BlocklyDuino/v2/](https://blocklyduino.github.io/BlocklyDuino/v2/)
 >
+> ▶️ **Play the ported game online:** [https://blocklyduino-sitd.netlify.app/level/index.html?level=1](https://blocklyduino-sitd.netlify.app/level/index.html?level=1)
+>
 > This repository is kept as an archive/reference for the original v1-based implementation.
 
 ## 1. Project Overview
@@ -205,8 +207,15 @@ Here is a summary of the tools and tasks for each level as defined in the enviro
 
 ### Try Online
 
--   [Smart in the Dark - Custom Version - Level 1](https://blocklyduino-smart-in-the-dark-sg.netlify.app/level/1)
--   [Smart in the Dark - Custom Version - Level 2](https://blocklyduino-smart-in-the-dark-sg.netlify.app/level/2)
+> The original online demo of this v1-based version was removed (drag-and-drop broken on current Chromium browsers). The game is now available, rebuilt on BlocklyDuino v2:
+
+-   [Smart in the Dark — Level 1](https://blocklyduino-sitd.netlify.app/level/index.html?level=1)
+-   [Smart in the Dark — Level 2](https://blocklyduino-sitd.netlify.app/level/index.html?level=2)
+-   [Smart in the Dark — Level 3](https://blocklyduino-sitd.netlify.app/level/index.html?level=3)
+-   [Smart in the Dark — Level 4](https://blocklyduino-sitd.netlify.app/level/index.html?level=4)
+
+Official BlocklyDuino examples (legacy v1):
+
 -   [Blink Example](http://blocklyduino.github.io/BlocklyDuino/blockly/apps/blocklyduino/index.html?url=examples/blink.xml)
 -   [Servo + Potentiometer](http://blocklyduino.github.io/BlocklyDuino/blockly/apps/blocklyduino/index.html?url=examples/servo_potentio.xml)
 -   [LED Color Button](http://blocklyduino.github.io/BlocklyDuino/blockly/apps/blocklyduino/index.html?url=examples/click_color.xml)
